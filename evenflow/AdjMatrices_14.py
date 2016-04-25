@@ -59,7 +59,7 @@ def adjmatrices(t, sigthresht, tvsizero):
                 firstsigflag = 1
 
                 if nlags > 1:
-                    if t[lag, sX, sY] > t[lag+1, xS, sY]:
+                    if t[lag, sX, sY] > t[lag+1, sX, sY]:
                         helper3(sX, sY, lag)
                         firstpeakflag = 1
                 else:
@@ -91,8 +91,8 @@ def adjmatrices(t, sigthresht, tvsizero):
                                 firstsiglag[sX, sY] = lag+1
                                 firstsigflag = 1
                             if firstpeakflag == 0 and t[lag, sX, sY ] > t[lag - 1, sX, sY ]:
-                                charLagFirst[sX,sY] = lag;
-                                TcharLagFirst[sX,sY] = t[lag,sX,sY];
+                                # charLagFirst[sX,sY] = lag;
+                                # TcharLagFirst[sX,sY] = t[lag,sX,sY];
                                 firstpeakflag = 1
                             if t[lag, sX, sY] > tcharlagmaxpeak[sX, sY]:
                                 helper2(sX, sY, lag)
