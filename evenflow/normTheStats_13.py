@@ -1,65 +1,67 @@
 import numpy as np
 from math import *
 
-def normthestats(nBinMat,I,T,SigThreshI,SigThreshT,meanShuffI,sigmaShuffI,meanShuffT,sigmaShuffT,HXt,HYw,HYf):
-    nLags, nSignals,junk=np.shape(I);
 
-    InormByDist=np.empty((nLags, nSignals, nSignals))
-    InormByDist.fill(np.nan)
+def normthestats(nbinmat, matrix_i, matrix_t, sigthreshi, sigthresht, meanshuffi, sigmashuffi, meanshufft, sigmashufft, hxt, HYw, hyf):
+    nlags, nsignals, junk = np.shape(matrix_i)
 
-    TnormByDist=np.empty((nLags, nSignals, nSignals))
-    TnormByDist.fill(np.nan)
+    inormbydist = np.empty((nlags, nsignals, nsignals))
+    inormbydist.fill(np.nan)
 
-    SigThreshInormByDist=np.empty((nSignals,nSignals))
-    SigThreshInormByDist.fill(np.nan)
+    tnormbydist = np.empty((nlags, nsignals, nsignals))
+    tnormbydist.fill(np.nan)
 
-    SigThreshTnormByDist=np.empty((nSignals,nSignals))
-    SigThreshTnormByDist.fill(np.nan)
+    sigthreshinormbydist = np.empty((nsignals, nsignals))
+    sigthreshinormbydist.fill(np.nan)
 
-    Ic=np.empty((nLags, nSignals, nSignals))
-    Ic.fill(np.nan)
+    sigthreshtnormbydist = np.empty((nsignals, nsignals))
+    sigthreshtnormbydist.fill(np.nan)
 
-    Tc=np.empty((nLags, nSignals, nSignals))
-    Tc.fill(np.nan)
+    ic = np.empty((nlags, nsignals, nsignals))
+    ic.fill(np.nan)
 
-    TvsIzero=np.empty((nLags, nSignals, nSignals))
-    TvsIzero.fill(np.nan)
+    tc = np.empty((nlags, nsignals, nsignals))
+    tc.fill(np.nan)
 
-    SigThreshTvsIzero=np.empty((nSignals,nSignals))
-    SigThreshTvsIzero.fill(np.nan)
+    tvsizero = np.empty((nlags, nsignals, nsignals))
+    tvsizero.fill(np.nan)
 
-    RelEnt=np.empty((nLags, nSignals, nSignals))
-    RelEnt.fill(np.nan)
+    sigthreshtvsizero = np.empty((nsignals, nsignals))
+    sigthreshtvsizero.fill(np.nan)
 
-    RelT=np.empty((nLags, nSignals, nSignals))
-    RelT.fill(np.nan)
+    relent = np.empty((nlags, nsignals, nsignals))
+    relent.fill(np.nan)
 
-    HXtNormByDist=np.empty((nLags, nSignals, nSignals))
-    HXtNormByDist.fill(np.nan)
+    relt = np.empty((nlags, nsignals, nsignals))
+    relt.fill(np.nan)
 
-    IvsIzero=np.empty((nLags, nSignals, nSignals))
-    IvsIzero.fill(np.nan)
+    hxtnormbydist = np.empty((nlags, nsignals, nsignals))
+    hxtnormbydist.fill(np.nan)
 
-    SigThreshIvsIzero=np.empty((nSignals,nSignals))
-    SigThreshIvsIzero.fill(np.nan)
+    ivsizero = np.empty((nlags, nsignals, nsignals))
+    ivsizero.fill(np.nan)
 
-    for i in range(nSignals):
-        for j in range(nSignals):
-            for t in range(nLags):
-                n = min(nBinMat[i],nBinMat[j])
-                InormByDist[t,i,j]=I[t,i,j]/log2(n)
-                TnormByDist[t,i,j]=T[t,i,j]/log2(n)
-                Ic[t,i,j]=0.5*(1+erf((I[t,i,j]-meanShuffI[i,j])/(sqrt(2)*sigmaShuffI[i,j])))
-                Tc[t,i,j]=0.5*(1+erf((T[t,i,j]-meanShuffT[i,j])/(sqrt(2)*sigmaShuffT[i,j])))
-                SigThreshInormByDist[i,j]=SigThreshI[i,j]/log2(n)
-                SigThreshTnormByDist[i,j]=SigThreshT[i,j]/log2(n)
-                TvsIzero[t,i,j]=T[t,i,j]/I[0,i,j]
-                SigThreshTvsIzero[i,j]=SigThreshT[i,j]/I[0,i,j]
-                RelEnt[t,i,j]=I[t,i,j]/HYf[t,i,j]
-                RelT[t,i,j]=T[t,i,j]/HYf[t,i,j]
+    sigthreshivsizero = np.empty((nsignals, nsignals))
+    sigthreshivsizero.fill(np.nan)
 
-                HXtNormByDist[t,i,j]=HXt[t,i,j]/log2(n)
-                IvsIzero[t,i,j]=I[t,i,j]/I[0,i,j]
-                SigThreshIvsIzero[i,j]=SigThreshI[i,j]/I[0,i,j]
+    for i in range(nsignals):
+        for j in range(nsignals):
+            for t in range(nlags):
+                n = min(nbinmat[i], nbinmat[j])
+                inormbydist[t, i, j] = matrix_i[t, i, j]/log2(n)
+                tnormbydist[t, i, j] = matrix_t[t, i, j]/log2(n)
+                ic[t, i, j] = 0.5*(1+erf((matrix_i[t, i, j]-meanshuffi[i, j])/(sqrt(2)*sigmashuffi[i, j])))
+                tc[t, i, j] = 0.5*(1+erf((matrix_t[t, i, j]-meanshufft[i, j])/(sqrt(2)*sigmashufft[i, j])))
+                sigthreshinormbydist[i, j] = sigthreshi[i, j]/log2(n)
+                sigthreshtnormbydist[i, j] = sigthresht[i, j]/log2(n)
+                tvsizero[t, i, j] = matrix_t[t, i, j]/matrix_i[0, i, j]
+                sigthreshtvsizero[i, j] = sigthresht[i, j]/matrix_i[0, i, j]
+                relent[t, i, j] = matrix_i[t, i, j]/hyf[t, i, j]
+                relt[t, i, j] = matrix_t[t, i, j]/hyf[t, i, j]
 
-    return (InormByDist,TnormByDist,SigThreshInormByDist,SigThreshTnormByDist,Ic,Tc,TvsIzero,SigThreshTvsIzero,RelEnt,RelT,HXtNormByDist,IvsIzero,SigThreshIvsIzero)
+                hxtnormbydist[t, i, j] = hxt[t, i, j]/log2(n)
+                ivsizero[t, i, j] = matrix_i[t, i, j]/matrix_i[0, i, j]
+                sigthreshivsizero[i, j] = sigthreshi[i, j]/matrix_i[0, i, j]
+
+    return inormbydist, tnormbydist, sigthreshinormbydist, sigthreshtnormbydist, ic, tc, tvsizero, sigthreshtvsizero,\
+        relent, relt, hxtnormbydist, ivsizero, sigthreshivsizero
