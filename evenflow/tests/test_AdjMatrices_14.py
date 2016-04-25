@@ -423,26 +423,26 @@ FirstSigLag=np.array([9,2,2,2,6,2,3,2,4]).reshape((3,3))
 LastSigLag=np.array([17,13,28,21,16,31,14,9,37]).reshape((3,3))
 
 for i in range(len(T)):
-	T[i] = T[i].transpose()
+    T[i] = T[i].transpose()
 
 for i in range(len(TvsIzero)):
-	TvsIzero[i] = TvsIzero[i].transpose()
+    TvsIzero[i] = TvsIzero[i].transpose()
 
 for i in range(len(Abinary)):
-	Abinary[i] = Abinary[i].transpose()
+    Abinary[i] = Abinary[i].transpose()
 
 for i in range(len(Awtd)):
-	Awtd[i] = Awtd[i].transpose()
+    Awtd[i] = Awtd[i].transpose()
 
 for i in range(len(AwtdCut)):
-	AwtdCut[i] = AwtdCut[i].transpose()
+    AwtdCut[i] = AwtdCut[i].transpose()
 
 
-result = AdjMatrices(T, SigThreshT, TvsIzero)
+result = adjmatrices(T, SigThreshT, TvsIzero)
 
 import_result = (Abinary, Awtd, AwtdCut, charLagFirstPeak, TcharLagFirstPeak, charLagMaxPeak, TcharLagMaxPeak, TvsIzerocharLagMaxPeak, nSigLags, FirstSigLag, LastSigLag)
 
 
 
 for i in range(len(result)):
-	assert np.isclose(result[i],  import_result[i]).all()
+    assert np.isclose(result[i],  import_result[i]).all()

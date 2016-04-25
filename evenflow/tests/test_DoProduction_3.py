@@ -284,14 +284,13 @@ Tminus = np.array([-3.9968028886505635E-15,0.4507299635970794,0.4722376828750789
 0.38571889025041273,0.37447096732089147,0.3657288342720868,0.35546094688946361,\
 0.33158023824251259,0.32767784025830871,0.33671860567010903,0.33742712309593692,\
 0.331909764987671]).reshape((3,37))
-print(T.shape)
-print((T == T).all())
+
 for i in range(len(T)):
-	T[i] = T[i].transpose()
+    T[i] = T[i].transpose()
 for i in range(len(T)):
-	TnetBinary[i] = TnetBinary[i].transpose()
-result = DoProduction(T)
+    TnetBinary[i] = TnetBinary[i].transpose()
+result = doproduction(T)
 import_result = (Tplus, Tminus, Tnet, TnetBinary)
 for i in range(len(result)):
-	assert (result[i]==  import_result[i]).all()
+    assert (result[i] == import_result[i]).all()
 

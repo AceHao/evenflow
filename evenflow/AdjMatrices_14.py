@@ -1,107 +1,102 @@
 import numpy as np
 
-#Computes an Adjacency Matrix A
-#Computes the Characteristic Lag Which is the First Significant Lag
-#Takes the Transfer Information Matrix and the Significance Thresholds
+# Computes an Adjacency Matrix A
+# Computes the Characteristic Lag Which is the First Significant Lag
+# Takes the Transfer Information Matrix and the Significance Thresholds
 
-def AdjMatrices(T, SigThreshT,TvsIzero):
-    def helper1(sX, sY, lag):
-        Abinary[lag, sX,sY] = 1
-        AwtdCut[lag, sX,sY] = T[lag, sX,sY]
-        LastSigLag[sX,sY] = lag+1
-        nSigLags[sX, sY] = nSigLags[sX, sY] + 1
+
+def adjmatrices(t, sigthresht, tvsizero):
+    def helper1(sx, sy, lag):
+        abinary[lag, sx,sy] = 1
+        awtdcut[lag, sx,sy] = t[lag, sx,sy]
+        lastsiglag[sx,sy] = lag+1
+        nsiglags[sx, sy] = nsiglags[sx, sy] + 1
         return
 
-    def helper2(sX, sY, lag):
-        charLagMaxPeak[sX, sY] = lag+1
-        TcharLagMaxPeak[sX, sY] = T[lag, sX,sY]
+    def helper2(sx, sy, lag):
+        charlagmaxpeak[sx, sy] = lag+1
+        tcharlagmaxpeak[sx, sy] = t[lag, sx,sy]
         return
 
-    def helper3(sX, sY, lag):
-        charLagFirstPeak[sX, sY] = lag+1
-        TcharLagFirstPeak[sX, sY] = T[lag, sX,sY]
+    def helper3(sx, sy, lag):
+        charlagfirstpeak[sx, sy] = lag+1
+        tcharlagfirstpeak[sx, sy] = t[lag, sx,sy]
         return
 
+    nlags, nsignals, junk = np.shape(t)
 
-    nLags, nSignals, junk = np.shape(T)
+    abinary = np.zeros((nlags, nsignals,nsignals))
+    awtd = np.empty((nlags, nsignals, nsignals))
+    awtd.fill(np.NAN)
 
-    Abinary = np.zeros((nLags, nSignals,nSignals))
-    Awtd = np.empty((nLags, nSignals, nSignals ))
-    Awtd.fill(np.NAN)
+    awtdcut = np.zeros((nlags, nsignals, nsignals))
+    charlagfirstpeak = np.zeros((nsignals, nsignals))
+    tcharlagfirstpeak = np.zeros((nsignals,nsignals))
+    charlagmaxpeak = np.zeros((nsignals,nsignals))
+    tcharlagmaxpeak = np.zeros((nsignals, nsignals))
+    tvsizerocharlagmaxpeak = np.zeros((nsignals, nsignals))
+    nsiglags = np.zeros((nsignals, nsignals))
+    firstsiglag = np.empty((nsignals, nsignals))
+    firstsiglag.fill(np.NAN)
 
-    AwtdCut = np.zeros((nLags, nSignals, nSignals ))
-    charLagFirstPeak = np.zeros((nSignals, nSignals))
-    TcharLagFirstPeak = np.zeros((nSignals,nSignals))
-    charLagMaxPeak = np.zeros((nSignals,nSignals))
-    TcharLagMaxPeak = np.zeros((nSignals, nSignals))
-    TvsIzerocharLagMaxPeak = np.zeros((nSignals, nSignals))
-    nSigLags = np.zeros((nSignals, nSignals))
-    FirstSigLag = np.empty((nSignals, nSignals))
-    FirstSigLag.fill(np.NAN)
+    lastsiglag = np.empty((nsignals, nsignals))
+    lastsiglag.fill(np.NAN)
 
-    LastSigLag = np.empty((nSignals, nSignals))
-    LastSigLag.fill(np.NAN)
+    for sX in range(nsignals):
+        for sY in range(nsignals):
+            firstpeakflag = 0
+            firstsigflag = 0
 
-    for sX in range(nSignals):
-        for sY in range(nSignals):
-            FirstPeakFlag = 0
-            FirstSigFlag = 0 
+            awtd = t
 
-            Awtd = T
-
-            #check the first Lag
+            # check the first Lag
             lag = 0
-            if T[lag, sX,sY] > SigThreshT[sX,sY]:
+            if t[lag, sX, sY] > sigthresht[sX,sY]:
                 helper1(sX, sY, lag)
                 helper2(sX, sY, lag)
                 
-                TvsIzerocharLagMaxPeak[sX, sY] = TvsIzero[lag, sX, sY]
-                FirstSigFlag  = 1 
+                tvsizerocharlagmaxpeak[sX, sY] = tvsizero[lag, sX, sY]
+                firstsigflag = 1
 
-                if nLags > 1:
-                    if T[lag, sX, sY] > T[lag+1, xS, sY]:
+                if nlags > 1:
+                    if t[lag, sX, sY] > t[lag+1, xS, sY]:
                         helper3(sX, sY, lag)
-                        FirstPeakFlag = 1
+                        firstpeakflag = 1
                 else:
                     helper3(sX, sY, lag)
-                    FirstPeakFlag = 1
+                    firstpeakflag = 1
 
-            #nlags: number of lags
-            #re-check indexing becaus matlab uses indexing start with 1, python uses 0.
-            #create function for 2 lag checkings (note the difference) for possible improvement 
-            #check the other lag
-            if nLags > 1:
-                for lag in range(1, nLags - 1):
-                    if T[lag, sX, sY] > SigThreshT[sX, sY]:
+            # nlags: number of lags
+            # re-check indexing becaus matlab uses indexing start with 1, python uses 0.
+            # create function for 2 lag checkings (note the difference) for possible improvement
+            # check the other lag
+            if nlags > 1:
+                for lag in range(1, nlags - 1):
+                    if t[lag, sX, sY] > sigthresht[sX, sY]:
                         helper1(sX, sY, lag)
-                        if FirstSigFlag == 0:
-                                FirstSigLag[sX, sY] = lag+1
-                                FirstSigFlag = 1
-                        if FirstPeakFlag == 0 and T[lag, sX, sY ] > T[lag - 1, sX, sY ] and T[lag, sX, sY ] > T[ lag + 1, sX, sY]:
+                        if firstsigflag == 0:
+                                firstsiglag[sX, sY] = lag+1
+                                firstsigflag = 1
+                        if firstpeakflag == 0 and t[lag, sX, sY] > t[lag - 1, sX, sY]and t[lag, sX, sY] > t[ lag + 1, sX, sY]:
                             helper3(sX, sY, lag)
-                            FirstPeakFlag =1
-                        if T[lag, sX, sY ] > TcharLagMaxPeak[sX, sY]:
+                            firstpeakflag = 1
+                        if t[lag, sX, sY] > tcharlagmaxpeak[sX, sY]:
                             helper2(sX, sY, lag)
-                            TvsIzerocharLagMaxPeak[sX, sY] = TvsIzero[lag, sX, sY ]
-                #check the last lag
-                lag = nLags - 1 
-
-                if T[lag, sX, sY ] > SigThreshT[sX, sY]:
+                            tvsizerocharlagmaxpeak[sX, sY] = tvsizero[lag, sX, sY ]
+                # check the last lag
+                lag = nlags - 1
+                if t[lag, sX, sY ] > sigthresht[sX, sY]:
                             helper1(sX, sY, lag)
-                            if FirstSigFlag == 0:
-                                FirstSigLag[sX, sY] = lag+1
-                                FirstSigFlag = 1
-                            if FirstPeakFlag == 0 and T[lag, sX, sY ] > T[lag - 1, sX, sY ]:
-                                charLagFirst[sX,sY]=lag;
-                                TcharLagFirst[sX,sY]=T[lag,sX,sY];
-                                FirstPeakFlag =1
-                            if T[lag, sX, sY] > TcharLagMaxPeak[sX, sY]:
+                            if firstsigflag == 0:
+                                firstsiglag[sX, sY] = lag+1
+                                firstsigflag = 1
+                            if firstpeakflag == 0 and t[lag, sX, sY ] > t[lag - 1, sX, sY ]:
+                                charLagFirst[sX,sY] = lag;
+                                TcharLagFirst[sX,sY] = t[lag,sX,sY];
+                                firstpeakflag = 1
+                            if t[lag, sX, sY] > tcharlagmaxpeak[sX, sY]:
                                 helper2(sX, sY, lag)
-                                TvsIzerocharLagMaxPeak[sX, sY] = TvsIzero[lag, sX, sY]
+                                tvsizerocharlagmaxpeak[sX, sY] = tvsizero[lag, sX, sY]
 
-    return (Abinary, Awtd, AwtdCut, charLagFirstPeak, TcharLagFirstPeak, charLagMaxPeak, TcharLagMaxPeak, TvsIzerocharLagMaxPeak, nSigLags, FirstSigLag, LastSigLag)
-
-
-
-
-
+    return abinary, awtd, awtdcut, charlagfirstpeak, tcharlagfirstpeak, charlagmaxpeak, tcharlagmaxpeak,\
+           tvsizerocharlagmaxpeak, nsiglags, firstsiglag, lastsiglag
