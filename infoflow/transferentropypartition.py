@@ -1,6 +1,6 @@
 import numpy as np
 import sys
-import dvpartition3d as dvp3
+from infoflow import dvpartition3d as dvp3
 import math
 
 
@@ -41,6 +41,11 @@ def transferentropypartition(X, Y, t, w):
     % along with this program.  If not, see <http://www.gnu.org/licenses/>.
     '''
 
+    def rank(np_arr):
+        flat = np_arr.flatten()
+        flat[flat.argsort()] = range(len(flat))
+        return flat.reshape(len(flat), 1)
+
 
     # fix block lengths at 1
     l, k=1, 1
@@ -50,39 +55,59 @@ def transferentropypartition(X, Y, t, w):
 
     # go through the time series X and Y, and populate Xpat, Ypat, and Yt
     Xpat, Ypat, Yt= [], [], []
-    for i in range(max([l+t, k+w])-1, min([len(X), len(Y)])+1, 1):
-        Xpat = np.hstack( Xpat,  X[i-l-t+1:i-t])
-        Ypat = np.hstack([Ypat,  Y[i-k-w+1:i-w]])
-        Yt = np.hstack(Yt, Y[i])
+    for i in range(max([l+t, k+w])-1, min([len(X), len(Y)]), 1):
+        Xpat.append(X[i-l-t+1:i-t+1])
+        Ypat.append(Y[i-k-w+1:i-w+1])
+        #print(Y[i-k-w:i-w])
 
+        Yt.append(Y[i])
+    Xpat, Ypat, Yt = np.array(Xpat), np.array(Ypat), np.array(Yt)
 
     # ordinal sampling (ranking)
     Nt = len(Xpat)
-    B,IX = np.sort(Xpat), np.argsort(Xpat)
-    Xpat[IX] = list(range(0,Nt))
-    B,IX = np.sort(Ypat), np.argsort(Ypat)
-    Ypat[IX] = list(range(0,Nt))
-    B, IX = np.sort(Yt), np.argsort(Yt)
-    Yt[IX] = list(range(0,Nt))
+    #print(Xpat[0])
+    Xpat = rank(Xpat)
+    #B,IX = np.sort(Xpat), np.argsort(Xpat)
+    #Xpat[IX] = list(range(Nt))
+    #print(Ypat[0])
+    Ypat = rank(Ypat)
+    #B,IX = np.sort(Ypat), np.argsort(Ypat)
+    #Ypat[IX] = list(range(Nt))
+    Yt = rank(Yt)
+    #B, IX = np.sort(Yt), np.argsort(Yt)
+    #Yt[IX] = list(range(Nt))
 
     # compute transfer entropy
     # dlmwrite('Xpat.csv',Xpat,'Precision',16);
     # dlmwrite('Ypat.csv',Ypat,'Precision',16);
     # dlmwrite('Yt.csv',Yt,'Precision',16);
+
     partitions = dvp3.dvpartition3d(Xpat,Ypat,Yt,1,Nt,1,Nt,1,Nt)
     # %dlmwrite('partitions.csv',partitions,'Precision',16);
+    for element in partitions:
+        print(element)
     nPar = len(partitions)
     dimPar = np.zeros((nPar,1))
     for i in range(nPar):
         dimPar[i] = partitions[i]["Xmax"] - partitions[i]["Xmin"] + 1
-
-    T = 0
+        T = 0
     for i in range(len(partitions)):
         a = partitions[i]["N"] / Nt
-        b = sum(Xpat >= partitions[i]["Xmin"] & Xpat <= partitions[i]["Xmax"] & Ypat >= partitions[i]["Ymin"] &
-                Ypat <= partitions[i]["Ymax"] / Nt)
-        c = sum(Yt >= partitions[i]["Zmin"] & Yt <= partitions[i]["Zmax"] & Ypat >= partitions[i]["Ymin"] &
-                Ypat <= partitions[i]["Ymax"] / Nt)
+        #print(a)
+        b = sum(np.logical_and(
+                np.logical_and(
+                np.logical_and(
+                Xpat >= partitions[i]["Xmin"], Xpat <= partitions[i]["Xmax"]),
+                Ypat >= partitions[i]["Ymin"]),
+                Ypat <= partitions[i]["Ymax"])) / Nt
+
+        c = sum(np.logical_and(
+                np.logical_and(
+                np.logical_and(
+                Yt >= partitions[i]["Zmin"], Yt <= partitions[i]["Zmax"]),
+                Ypat >= partitions[i]["Ymin"]),
+                Ypat <= partitions[i]["Ymax"])) / Nt
+
         d = (partitions[i]["Ymax"] - partitions[i]["Ymin"] + 1) / Nt
         T += a * math.log2((a*d) / (b*c))
 
