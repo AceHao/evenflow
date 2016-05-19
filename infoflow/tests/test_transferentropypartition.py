@@ -15,5 +15,6 @@ t2 = np.genfromtxt(sys.path[0]+out_path+'T2(i).csv', delimiter=',').reshape((1, 
 npar = np.genfromtxt(sys.path[0]+out_path+'nPar.csv', delimiter=',').reshape((1, 1))[0][0]
 dimpar = np.genfromtxt(sys.path[0]+out_path+'dimPar.csv', delimiter=',').reshape((38, 1))
 
-
-print(tep.transferentropypartition(x,y,t,w)[0], t2)
+assert tep.transferentropypartition(x,y,t,w)[0] == t2
+assert tep.transferentropypartition(x,y,t,w)[1] == npar
+assert (tep.transferentropypartition(x,y,t,w)[2] == dimpar).all()

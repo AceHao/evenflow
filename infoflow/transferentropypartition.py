@@ -43,7 +43,7 @@ def transferentropypartition(X, Y, t, w):
 
     def rank(np_arr):
         flat = np_arr.flatten()
-        flat[flat.argsort()] = range(len(flat))
+        flat[flat.argsort()] = range(1, len(flat)+1)
         return flat.reshape(len(flat), 1)
 
 
@@ -58,24 +58,15 @@ def transferentropypartition(X, Y, t, w):
     for i in range(max([l+t, k+w])-1, min([len(X), len(Y)]), 1):
         Xpat.append(X[i-l-t+1:i-t+1])
         Ypat.append(Y[i-k-w+1:i-w+1])
-        #print(Y[i-k-w:i-w])
 
         Yt.append(Y[i])
     Xpat, Ypat, Yt = np.array(Xpat), np.array(Ypat), np.array(Yt)
 
     # ordinal sampling (ranking)
     Nt = len(Xpat)
-    #print(Xpat[0])
     Xpat = rank(Xpat)
-    #B,IX = np.sort(Xpat), np.argsort(Xpat)
-    #Xpat[IX] = list(range(Nt))
-    #print(Ypat[0])
     Ypat = rank(Ypat)
-    #B,IX = np.sort(Ypat), np.argsort(Ypat)
-    #Ypat[IX] = list(range(Nt))
     Yt = rank(Yt)
-    #B, IX = np.sort(Yt), np.argsort(Yt)
-    #Yt[IX] = list(range(Nt))
 
     # compute transfer entropy
     # dlmwrite('Xpat.csv',Xpat,'Precision',16);
@@ -84,8 +75,6 @@ def transferentropypartition(X, Y, t, w):
 
     partitions = dvp3.dvpartition3d(Xpat,Ypat,Yt,1,Nt,1,Nt,1,Nt)
     # %dlmwrite('partitions.csv',partitions,'Precision',16);
-    for element in partitions:
-        print(element)
     nPar = len(partitions)
     dimPar = np.zeros((nPar,1))
     for i in range(nPar):
