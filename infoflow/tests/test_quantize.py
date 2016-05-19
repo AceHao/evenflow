@@ -9,7 +9,7 @@ in_path = 'in_quantize/'
 out_path = 'out_quantize/'
 
 x = np.genfromtxt(sys.path[0]+in_path+'x.csv', delimiter=',').reshape((1, 202))
-partition = np.genfromtxt(sys.path[0]+ in_path+'partition.csv', delimiter=',').tolist()
+partition = np.genfromtxt(sys.path[0]+ in_path+'partition.csv', delimiter=',')
 xquant = np.genfromtxt(sys.path[0]+out_path+'xquant.csv', delimiter=',').reshape((1, 202))
 
 assert np.all((xquant == qtz.quantize(x, partition, 0)))
